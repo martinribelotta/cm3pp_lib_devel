@@ -9,6 +9,7 @@
 #define PRINT_H_
 
 #include <cstddef>
+#include <cstdint>
 
 namespace IO {
 

@@ -47,3 +47,6 @@ extern "C" void __assert_func(const char *file, int line, const char *func,
 extern "C" void __assert(const char *file, int line, const char *failedexpr) {
 	__assert_func(file, line, NULL, failedexpr);
 }
+
+extern "C" void _init(void) {
+}

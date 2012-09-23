@@ -15,6 +15,8 @@ namespace STM32 {
 
 namespace GPIO {
 
+#define INLINE_GPIO_CONFIG
+
 enum Pin_t {
 	Pin0 = (1 << 0),
 	Pin1 = (1 << 1),
@@ -52,7 +54,8 @@ enum GPIOSpeed_t {
 enum Mode {
 	InAnalog = 0x0, //!<
 	InFloating = 0x1, //!<
-	InPulled = 0x2, //!<
+	InPullUp = 0x12, //!<
+	InPullDown = 0x12, //!<
 	OutPP = 0x0, //!<
 	OutOD = 0x1, //!<
 	AltPP = 0x2, //!<
@@ -69,37 +72,57 @@ enum Speed {
 class PinConfig {
 public:
 	PinConfig(int bit, Speed speed, Mode mode) :
-			config_high(bit > 7 ? ((speed | (mode << 2)) << ((bit & 7) * 4)) : 0), //
-			config_low(bit > 7 ? 0 : ((speed | (mode << 2)) << ((bit & 7) * 4))), //
-			mask_high(bit > 7 ? (0xF << ((bit & 7) * 4)) : 0), //
-			mask_low(bit > 7 ? 0 : (0xF << ((bit & 7) * 4))) //
+			config_h(bit > 7 ? make_config(bit, speed, mode) : 0), //
+			config_l(bit > 7 ? 0 : make_config(bit, speed, mode)), //
+			mask_h(bit > 7 ? (0xF << ((bit & 7) * 4)) : 0), //
+			mask_l(bit > 7 ? 0 : (0xF << ((bit & 7) * 4))) //
 	{
 	}
 
-	inline const uint32_t CFH() const {
-		return config_high;
+	PinConfig() :
+			config_h(0x44444444), config_l(0x44444444), //
+			mask_h(0xffffffff), mask_l(0xffffffff) //
+	{
 	}
 
-	inline const uint32_t CFL() const {
-		return config_low;
+	inline const uint32_t CRH() const {
+		return config_h;
+	}
+
+	inline const uint32_t CRL() const {
+		return config_l;
 	}
 
 	inline const uint32_t maskH() const {
-		return mask_high;
+		return mask_h;
 	}
 
 	inline const uint32_t maskL() const {
-		return mask_low;
+		return mask_l;
+	}
+
+	inline const PinConfig operator+(const PinConfig& other) const {
+		return PinConfig( //
+				config_h | other.config_h, //
+				config_l | other.config_l, //
+				mask_h | other.mask_h, //
+				mask_l | other.mask_l //
+						);
 	}
 
 private:
-	const uint32_t config_high;
-	const uint32_t config_low;
-	const uint32_t mask_high;
-	const uint32_t mask_low;
+	const uint32_t config_h;
+	const uint32_t config_l;
+	const uint32_t mask_h;
+	const uint32_t mask_l;
 
 	PinConfig(uint32_t cfh, uint32_t cfl, uint32_t mh, uint32_t ml) :
-			config_high(cfh), config_low(cfl), mask_high(mh), mask_low(ml) {
+			config_h(cfh), config_l(cfl), mask_h(mh), mask_l(ml) //
+	{
+	}
+
+	static inline uint32_t make_config(int bit, Speed speed, Mode mode) {
+		return ((speed | ((mode & 3) << 2)) << ((bit & 7) * 4));
 	}
 };
 
@@ -107,6 +130,12 @@ class Port: GPIO_TypeDef {
 public:
 	Port() = delete;
 
+#ifdef INLINE_GPIO_CONFIG
+	inline void init(const PinConfig& config) {
+		this->CRH = (PinConfig().CRH() & ~config.maskH()) | config.CRH();
+		this->CRL = (PinConfig().CRL() & ~config.maskL()) | config.CRL();
+	}
+#else
 	inline void init(uint16_t pins, GPIOMode_t mode, GPIOSpeed_t speed =
 			Speed_50MHz) {
 		GPIO_InitTypeDef conf;
@@ -115,6 +144,7 @@ public:
 		conf.GPIO_Mode = static_cast<GPIOMode_TypeDef>(mode);
 		GPIO_Init(this, &conf);
 	}
+#endif
 
 	uint16_t readInputData() const {
 		return static_cast<uint16_t>(this->IDR);
