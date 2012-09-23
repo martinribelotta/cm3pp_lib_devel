@@ -15,8 +15,6 @@ namespace STM32 {
 
 namespace GPIO {
 
-#define INLINE_GPIO_CONFIG
-
 enum Pin_t {
 	Pin0 = (1 << 0),
 	Pin1 = (1 << 1),
@@ -34,21 +32,6 @@ enum Pin_t {
 	Pin13 = (1 << 13),
 	Pin14 = (1 << 14),
 	Pin15 = (1 << 15)
-};
-
-enum GPIOMode_t {
-	Mode_AIN = 0x0,
-	Mode_IN_FLOATING = 0x04,
-	Mode_IPD = 0x28,
-	Mode_IPU = 0x48,
-	Mode_Out_OD = 0x14,
-	Mode_Out_PP = 0x10,
-	Mode_AF_OD = 0x1C,
-	Mode_AF_PP = 0x18
-};
-
-enum GPIOSpeed_t {
-	Speed_10MHz = 1, Speed_2MHz, Speed_50MHz
 };
 
 enum Mode {
@@ -147,23 +130,12 @@ class Port: GPIO_TypeDef {
 public:
 	Port() = delete;
 
-#ifdef INLINE_GPIO_CONFIG
 	inline void init(const PinConfig& config) {
 		this->CRH = (PinConfig().CRH() & ~config.maskH()) | config.CRH();
 		this->CRL = (PinConfig().CRL() & ~config.maskL()) | config.CRL();
 		this->BRR = config.pullUpMask();
 		this->BSRR = config.pullDownMask();
 	}
-#else
-	inline void init(uint16_t pins, GPIOMode_t mode, GPIOSpeed_t speed =
-			Speed_50MHz) {
-		GPIO_InitTypeDef conf;
-		conf.GPIO_Pin = pins;
-		conf.GPIO_Speed = static_cast<GPIOSpeed_TypeDef>(speed);
-		conf.GPIO_Mode = static_cast<GPIOMode_TypeDef>(mode);
-		GPIO_Init(this, &conf);
-	}
-#endif
 
 	uint16_t readInputData() const {
 		return static_cast<uint16_t>(this->IDR);

@@ -6,12 +6,13 @@ using namespace STM32;
 using namespace CM3;
 using namespace OwnStream;
 
-extern void hwInit();
-
 int main() {
 	SystemTick.init();
 	PortB.enable();
-	hwInit();
+	PortB.init(
+			GPIO::PinConfig(11, GPIO::Speed50Mhz, GPIO::OutPP)
+					+ GPIO::PinConfig(12, GPIO::Speed50Mhz, GPIO::OutPP)
+					+ GPIO::PinConfig(2, GPIO::SpeedIn, GPIO::InPullUp));
 	while (1) {
 		usb << "** Led on  ** at" << SystemTick.current_tick() << "\r\n";
 		PortB.setBits(GPIO::Pin11);
