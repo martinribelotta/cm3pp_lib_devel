@@ -29,13 +29,10 @@ private:
 	}
 
 public:
-	static USBStream& instance() {
-		static USBStream singleton;
-		return singleton;
-	}
+	static USBStream singleton;
 };
 
-static USBStream& usb = USBStream::instance();
+static USBStream& usb = USBStream::singleton;
 
 }
 
