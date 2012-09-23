@@ -13,42 +13,60 @@
 
 namespace OwnStream {
 
-template<typename Writer>
-class OutStream {
-private:
-	Writer out;
-
+class AbstractStream {
 protected:
-	void write(char c) {
-		out.write(c);
+	virtual void write(char c) = 0;
+
+	virtual void write(const char *ptr, int size) {
+		while (size--)
+			write(*ptr++);
 	}
 
-	void write(const char *ptr, int size) {
-		out.write(ptr, size);
-	}
-
-	void write(const char *ptr) {
-		out.write(ptr);
+	virtual void write(const char *ptr) {
+		while (*ptr)
+			write(*ptr++);
 	}
 
 public:
-	OutStream() = delete;
+	enum Radix_t {
+		BIN = 2,
+		OCT = 8,
+		DEC = 10,
+		HEX = 16
+	};
 
-	OutStream& operator<<(const char *str) {
+	AbstractStream() : m_radix(DEC) {
+	}
+
+	virtual ~AbstractStream() {
+	}
+
+	AbstractStream& operator<<(const char *str) {
 		write(str);
 		return *this;
 	}
 
-	OutStream& operator<<(char c) {
+	AbstractStream& operator<<(char c) {
 		write(c);
 		return *this;
 	}
 
-	OutStream& operator<<(int n) {
+	AbstractStream& operator<<(int n) {
+		print(n);
 		return *this;
 	}
-};
 
+	AbstractStream& operator<<(Radix_t radix) {
+		m_radix = radix;
+		return *this;
+	}
+
+private:
+	void print(int value);
+	void print(unsigned int value);
+
+	Radix_t m_radix;
+};
 
 } /* namespace Stream */
 #endif /* STREAM_H_ */
