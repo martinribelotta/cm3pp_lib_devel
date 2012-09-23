@@ -75,13 +75,16 @@ public:
 			config_h(bit > 7 ? make_config(bit, speed, mode) : 0), //
 			config_l(bit > 7 ? 0 : make_config(bit, speed, mode)), //
 			mask_h(bit > 7 ? (0xF << ((bit & 7) * 4)) : 0), //
-			mask_l(bit > 7 ? 0 : (0xF << ((bit & 7) * 4))) //
+			mask_l(bit > 7 ? 0 : (0xF << ((bit & 7) * 4))), //
+			pull_up(mode == InPullUp ? (1 << bit) : 0), //
+			pull_down(mode == InPullDown ? (1 << bit) : 0) //
 	{
 	}
 
 	PinConfig() :
 			config_h(0x44444444), config_l(0x44444444), //
-			mask_h(0xffffffff), mask_l(0xffffffff) //
+			mask_h(0xffffffff), mask_l(0xffffffff), //
+			pull_up(0), pull_down(0) //
 	{
 	}
 
@@ -101,12 +104,22 @@ public:
 		return mask_l;
 	}
 
+	inline const uint32_t pullUpMask() const {
+		return pull_up;
+	}
+
+	inline const uint32_t pullDownMask() const {
+		return pull_down;
+	}
+
 	inline const PinConfig operator+(const PinConfig& other) const {
 		return PinConfig( //
 				config_h | other.config_h, //
 				config_l | other.config_l, //
 				mask_h | other.mask_h, //
-				mask_l | other.mask_l //
+				mask_l | other.mask_l, //
+				pull_up | other.pull_up, //
+				pull_down | other.pull_down //
 						);
 	}
 
@@ -115,9 +128,13 @@ private:
 	const uint32_t config_l;
 	const uint32_t mask_h;
 	const uint32_t mask_l;
+	const uint32_t pull_up;
+	const uint32_t pull_down;
 
-	PinConfig(uint32_t cfh, uint32_t cfl, uint32_t mh, uint32_t ml) :
-			config_h(cfh), config_l(cfl), mask_h(mh), mask_l(ml) //
+	PinConfig(uint32_t cfh, uint32_t cfl, uint32_t mh, uint32_t ml, //
+			uint32_t pu, uint32_t pd) :
+			config_h(cfh), config_l(cfl), mask_h(mh), mask_l(ml), //
+			pull_up(pu), pull_down(pd) //
 	{
 	}
 
@@ -134,6 +151,8 @@ public:
 	inline void init(const PinConfig& config) {
 		this->CRH = (PinConfig().CRH() & ~config.maskH()) | config.CRH();
 		this->CRL = (PinConfig().CRL() & ~config.maskL()) | config.CRL();
+		this->BRR = config.pullUpMask();
+		this->BSRR = config.pullDownMask();
 	}
 #else
 	inline void init(uint16_t pins, GPIOMode_t mode, GPIOSpeed_t speed =

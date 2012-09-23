@@ -1,6 +1,6 @@
 #include <cxx/GPIO.h>
 #include <cxx/SysTick.h>
-#include <string>
+
 #include <usbd_cdc_vcp.h>
 
 using namespace STM32;

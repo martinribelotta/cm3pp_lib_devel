@@ -7,6 +7,8 @@
 
 #include <stdlib.h>
 
+void *__dso_handle = 0;
+
 /**
  * This is an error handler that is invoked by the C++ runtime when a pure virtual function is called.
  * If anywhere in the runtime of your program an object is created with a virtual function pointer not

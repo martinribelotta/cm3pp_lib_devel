@@ -19,40 +19,38 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-
 #include "stm32f10x.h" /* for _get_PSP() from core_cm3.h*/
 
 #undef errno
 extern int errno;
 
 extern int errno;
-extern int  _end;
+extern int _end;
 caddr_t _sbrk(int incr) {
 
-	  static unsigned char *heap = NULL;
-	  unsigned char *prev_heap;
-	  if (heap == NULL) {
-		  heap = (unsigned char *)&_end;
-	  }
+	static unsigned char *heap = NULL;
+	unsigned char *prev_heap;
+	if (heap == NULL) {
+		heap = (unsigned char *) &_end;
+	}
 
-	  prev_heap = heap;
-	  heap += incr;
-	  return (caddr_t) prev_heap;
+	prev_heap = heap;
+	heap += incr;
+	return (caddr_t) prev_heap;
 }
 
-void _exit(int status)
-{
+void _exit(int status) {
 	// xprintf("_exit called with parameter %d\n", status);
-	while(1) {;} // Blocca tutto!
+	while (1) {
+		;
+	} // Blocca tutto!
 }
 
-int _getpid(void)
-{
+int _getpid(void) {
 	return 1;
 }
 
-int _kill(int pid, int sig)
-{
+int _kill(int pid, int sig) {
 	(void) pid;
 	(void) sig; /* avoid warnings */
 	errno = EINVAL;
@@ -63,19 +61,20 @@ int link(char *old, char *new) {
 	return -1;
 }
 
-int _close(int file)
-{
+int _open(const char *name, int flags, int mode) {
 	return -1;
 }
 
-int _fstat(int file, struct stat *st)
-{
+int _close(int file) {
+	return -1;
+}
+
+int _fstat(int file, struct stat *st) {
 	st->st_mode = S_IFCHR;
 	return 0;
 }
 
-int _isatty(int file)
-{
+int _isatty(int file) {
 	return 1;
 }
 
@@ -83,25 +82,21 @@ int _lseek(int file, int ptr, int dir) {
 	return 0;
 }
 
-int _read(int file, char *ptr, int len)
-{
+int _read(int file, char *ptr, int len) {
 	return 0;
 }
 
-int _write(int file, char *ptr, int len)
-{
+int _write(int file, char *ptr, int len) {
 	return len;
 }
 
 // extern char _end; /* Defined by the linker (c'è gia' sopra)*/
 static char *heap_end;
 
-char* get_heap_end(void)
-{
+char* get_heap_end(void) {
 	return (char*) heap_end;
 }
 
-char* get_stack_top(void)
-{
+char* get_stack_top(void) {
 	return (char*) __get_MSP();
 }
