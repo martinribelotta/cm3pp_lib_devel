@@ -1,36 +1,12 @@
 #include <cxx/GPIO.h>
 #include <cxx/SysTick.h>
-#include <cxx/Stream.h>
-
-#include <usbd_cdc_vcp.h>
+#include <cxx/USBStream.h>
 
 using namespace STM32;
 using namespace CM3;
-
-void SerialUSB_WriteLn(const char *msg) {
-	while (*msg)
-		if (usb_cdc_putc(*msg++) == -1)
-			break;
-}
+using namespace OwnStream;
 
 extern void hwInit();
-
-class USBStream: public OwnStream::AbstractStream {
-protected:
-	virtual void write(char c) {
-		usb_cdc_putc(c);
-	}
-
-	virtual void write(const char *ptr, int size) {
-		usb_cdc_write(ptr, size);
-	}
-public:
-	USBStream() {
-		usb_cdc_open();
-	}
-};
-
-USBStream usb;
 
 int main() {
 	SystemTick.init();
