@@ -11,10 +11,13 @@ namespace OwnStream {
 
 static const char DIGIT_TABLE[] = "0123456789ABCDEF";
 
-void AbstractStream::print(unsigned int value) {
+void AbstractStream::print(unsigned int value, unsigned int deep) {
 	if (value >= m_radix)
-		print(value / m_radix);
-	write(DIGIT_TABLE + (value % m_radix));
+		print(value / m_radix, deep + 1);
+	else
+		while (++deep < width)
+			write(fill_char);
+	write(DIGIT_TABLE[(value % m_radix)]);
 }
 
 void AbstractStream::print(int value) {

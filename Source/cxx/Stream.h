@@ -29,13 +29,28 @@ protected:
 
 public:
 	enum Radix_t {
-		BIN = 2,
-		OCT = 8,
-		DEC = 10,
-		HEX = 16
+		BIN = 2, OCT = 8, DEC = 10, HEX = 16
 	};
 
-	AbstractStream() : m_radix(DEC) {
+	class FillChar {
+	public:
+		const char fill;
+
+		FillChar(char c) :
+				fill(c) {
+		}
+	};
+
+	class Width {
+	public:
+		const unsigned int width;
+		Width(unsigned int n) :
+				width(n) {
+		}
+	};
+
+	AbstractStream() :
+			width(0), fill_char(' '), m_radix(DEC) {
 	}
 
 	virtual ~AbstractStream() {
@@ -56,15 +71,36 @@ public:
 		return *this;
 	}
 
+	AbstractStream& operator<<(unsigned int n) {
+		print(n);
+		return *this;
+	}
+
 	AbstractStream& operator<<(Radix_t radix) {
 		m_radix = radix;
 		return *this;
 	}
 
+	AbstractStream& operator<<(FillChar c) {
+		fill_char = c.fill;
+		return *this;
+	}
+
+	AbstractStream& operator<<(Width w) {
+		width = w.width;
+		return *this;
+	}
+
+	AbstractStream& operator<<(bool b) {
+		return *this << (b? "true" : "false");
+	}
+
 private:
 	void print(int value);
-	void print(unsigned int value);
+	void print(unsigned int value, unsigned int deep = 0);
 
+	unsigned int width;
+	char fill_char;
 	Radix_t m_radix;
 };
 

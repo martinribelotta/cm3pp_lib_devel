@@ -126,7 +126,7 @@ private:
 	}
 };
 
-class Port: GPIO_TypeDef {
+class Port: public GPIO_TypeDef {
 public:
 	Port() = delete;
 
@@ -169,7 +169,7 @@ public:
 		this->ODR = static_cast<uint16_t>(value);
 	}
 
-	void enable() const {
+	const void enable() const {
 		switch (reinterpret_cast<uint32_t>(this)) {
 			case GPIOA_BASE:
 			RCC ->APB2ENR |= RCC_APB2Periph_GPIOA;
@@ -195,7 +195,7 @@ public:
 		}
 	}
 
-	void disable() const {
+	const void disable() const {
 		switch (reinterpret_cast<uint32_t>(this)) {
 			case GPIOA_BASE:
 			RCC ->APB2ENR &= ~RCC_APB2Periph_GPIOA;
