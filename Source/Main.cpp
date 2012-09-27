@@ -6,6 +6,8 @@ using namespace STM32;
 using namespace CM3;
 using namespace OwnStream;
 
+extern void lambda_test();
+
 int main() {
 	SystemTick.init();
 	PortB.enable();
@@ -13,6 +15,7 @@ int main() {
 			GPIO::PinConfig(11, GPIO::Speed50Mhz, GPIO::OutPP)
 					+ GPIO::PinConfig(12, GPIO::Speed50Mhz, GPIO::OutPP)
 					+ GPIO::PinConfig(2, GPIO::SpeedIn, GPIO::InPullUp));
+	lambda_test();
 	while (1) {
 		usb << "** Led on  ** at " << //
 				USBStream::Width(0) << //

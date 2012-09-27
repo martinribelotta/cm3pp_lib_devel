@@ -25,6 +25,10 @@ inline void SysTick_Handler_cpp(void) {
 
 } /* namespace CM3 */
 
+#if 0
+
 extern "C" void SysTick_Handler(void) {
 	CM3::SysTick_Handler_cpp();
 }
+
+#endif
