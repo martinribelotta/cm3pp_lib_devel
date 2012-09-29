@@ -11,7 +11,7 @@
 #include "Stream.h"
 #include <usbd_cdc_vcp.h>
 
-namespace OwnStream {
+namespace Stream {
 
 class USBStream: public AbstractStream {
 protected:

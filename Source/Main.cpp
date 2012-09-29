@@ -6,7 +6,7 @@
 
 using namespace STM32;
 using namespace CM3;
-using namespace OwnStream;
+using namespace Stream;
 
 RTOS::Task taskLed(Functional::build([]() {
 	PortB.enable();
@@ -19,10 +19,10 @@ RTOS::Task taskLed(Functional::build([]() {
 		RTOS::taskWait(100);
 		PortB.resetBits(GPIO::Pin11);
 		RTOS::taskWait(100);
+		usb << "led loop\r\n";
 	}
 }));
 
-#if 1
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
 		usb << "** Led on  ** at " << //
@@ -41,17 +41,15 @@ RTOS::Task taskUSB(Functional::build([]() {
 				USBStream::HEX << //
 				unsigned(PortB.CRL) << "\r\n";
 		usb << " PORTB[2]=" << PortB.readInputDataBit(GPIO::Pin2) << "\r\n";
-		RTOS::taskWait(100);
+		RTOS::taskWait(1000);
 	}
 }));
-#endif
 
 int main() {
 #if 1
 	RTOS::startRTOS();
 	while(1)
 		;
-		// usb << "OS exit!\r\n";
 #else
 	SystemTick.init();
 	PortB.enable();

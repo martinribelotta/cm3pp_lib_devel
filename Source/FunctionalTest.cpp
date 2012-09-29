@@ -29,7 +29,7 @@ class LambdaTester {
 public:
 	LambdaTester() :
 			lamb(Functional::build([this] (void) -> void {
-				OwnStream::usb << "Hello lambda";
+				Stream::usb << "Hello lambda";
 			})) {
 	}
 

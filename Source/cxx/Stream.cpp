@@ -7,7 +7,7 @@
 
 #include "Stream.h"
 
-namespace OwnStream {
+namespace Stream {
 
 static const char DIGIT_TABLE[] = "0123456789ABCDEF";
 

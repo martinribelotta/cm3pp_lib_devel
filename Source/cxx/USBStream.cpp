@@ -1,6 +1,6 @@
 #include "USBStream.h"
 
-namespace OwnStream {
+namespace Stream {
 
 USBStream USBStream::singleton;
 

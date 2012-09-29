@@ -9,7 +9,7 @@
 namespace RTOS {
 
 static inline uint32_t get_IPSR(void) {
-	uint32_t r1 asm("r1");
+	uint32_t r1 asm("r1") = 0;
 	asm("MRS r1, IPSR");
 	return r1;
 }
@@ -30,6 +30,17 @@ void Task::execute() {
 			func();
 		suspend();
 	}
+}
+
+void TaskHelper::registerTask(Task *t) {
+	xTaskCreate( //
+			&TaskHelper::trampoline,//
+			(const signed char*)"",//
+			configMINIMAL_STACK_SIZE,//
+			(void*)t,//
+			2,//
+			&(t->handler)//
+			);
 }
 
 void TaskHelper::suspend(Task *t) {

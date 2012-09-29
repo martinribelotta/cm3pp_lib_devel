@@ -1,18 +1,17 @@
-/*
- * Stream.h
- *
- *  Created on: 23/09/2012
- *      Author: ruso
- */
-
 #ifndef STREAM_H_
 #define STREAM_H_
 
 #include <cstdint>
 #include <cstddef>
 
-namespace OwnStream {
+/**
+ * @brief Provide a way to send data over a serial channel
+ */
+namespace Stream {
 
+/**
+ * @brief Base class of serial stream
+ */
 class AbstractStream {
 protected:
 	virtual void write(char c) = 0;
