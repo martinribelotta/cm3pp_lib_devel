@@ -60,9 +60,11 @@
 #include "task.h"
 
 // To be complaint to CMSIS and ST standard peripherals library name convention.
+#ifdef RTOS_ENABLED
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
+#endif
 
 /* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
 defined.  The value should also ensure backward compatibility.

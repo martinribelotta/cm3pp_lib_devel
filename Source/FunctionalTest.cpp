@@ -24,15 +24,6 @@ void functional_test() {
 	f('a', 1.2);
 }
 
-typedef void (*LamLam_ret_t)(void);
-
-template<typename Func>
-LamLam_ret_t LamLam(Func f) {
-	return [f]() {
-		f();
-	};
-}
-
 class LambdaTester {
 	const Functional::LambdaCaller_t lamb;
 public:

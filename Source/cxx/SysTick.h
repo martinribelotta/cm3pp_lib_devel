@@ -17,7 +17,9 @@ public:
 	SystemTick_t() = delete;
 
 	void init(uint32_t ticks = SystemCoreClock) {
+#ifndef RTOS_ENABLED
 		SysTick_Config(ticks / 1000);
+#endif
 	}
 
 	inline int current_tick() const {
