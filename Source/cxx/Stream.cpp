@@ -15,8 +15,8 @@ void AbstractStream::print(unsigned int value, unsigned int deep) {
 	if (value >= m_radix)
 		print(value / m_radix, deep + 1);
 	else
-		while (++deep < width)
-			write(fill_char);
+		while (++deep < m_width)
+			write(m_fill);
 	write(DIGIT_TABLE[(value % m_radix)]);
 }
 

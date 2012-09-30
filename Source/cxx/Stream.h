@@ -48,58 +48,75 @@ public:
 		}
 	};
 
+	class Config {
+	public:
+		const int m_width;
+		const char m_fill;
+		const Radix_t m_radix;
+		Config(const int width, const char fill, const Radix_t radix) :
+			m_width(width), m_fill(fill), m_radix(radix) {
+		}
+	};
+
 	AbstractStream() :
-			width(0), fill_char(' '), m_radix(DEC) {
+			m_width(0), m_fill(' '), m_radix(DEC) {
 	}
 
 	virtual ~AbstractStream() {
 	}
 
-	AbstractStream& operator<<(const char *str) {
+	inline AbstractStream& operator<<(const char *str) {
 		write(str);
 		return *this;
 	}
 
-	AbstractStream& operator<<(char c) {
+	inline AbstractStream& operator<<(char c) {
 		write(c);
 		return *this;
 	}
 
-	AbstractStream& operator<<(int n) {
+	inline AbstractStream& operator<<(int n) {
 		print(n);
 		return *this;
 	}
 
-	AbstractStream& operator<<(unsigned int n) {
+	inline AbstractStream& operator<<(unsigned int n) {
 		print(n);
 		return *this;
 	}
 
-	AbstractStream& operator<<(Radix_t radix) {
+	inline AbstractStream& operator<<(Radix_t radix) {
 		m_radix = radix;
 		return *this;
 	}
 
-	AbstractStream& operator<<(FillChar c) {
-		fill_char = c.fill;
+	inline AbstractStream& operator<<(FillChar c) {
+		m_fill = c.fill;
 		return *this;
 	}
 
-	AbstractStream& operator<<(Width w) {
-		width = w.width;
+	inline AbstractStream& operator<<(Width w) {
+		m_width = w.width;
 		return *this;
 	}
 
-	AbstractStream& operator<<(bool b) {
+	inline AbstractStream& operator<<(bool b) {
 		return *this << (b? "true" : "false");
+	}
+
+	inline AbstractStream& operator<<(Config c) {
+		m_width = c.m_width;
+		m_fill = c.m_fill;
+		m_radix = c.m_radix;
+		return *this;
 	}
 
 private:
 	void print(int value);
 	void print(unsigned int value, unsigned int deep = 0);
 
-	unsigned int width;
-	char fill_char;
+	unsigned int m_width;
+	char m_fill;
 	Radix_t m_radix;
 };
 

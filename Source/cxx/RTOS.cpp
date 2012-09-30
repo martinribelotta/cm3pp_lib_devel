@@ -9,14 +9,21 @@
 namespace RTOS {
 
 static inline uint32_t get_IPSR(void) {
-	uint32_t r1 asm("r1") = 0;
-	asm("MRS r1, IPSR");
-	return r1;
+	uint32_t ipsr;
+	__asm__ __volatile__("mrs %0, ipsr" :"=r"(ipsr)::);
+	return ipsr;
 }
 
 #define EXCEPTION_MASK 0x0000001f
 
-static inline bool isInTaskMode(void) {
+/**
+ * @brief Determine if processor is in task mode
+ *
+ * If processor is in task mode (no ISR) return TRUE value
+ *
+ * @return True if processor is in task mode. False if in handler mode
+ */
+bool isInTaskMode(void) {
 	return (get_IPSR() & EXCEPTION_MASK) == 0;
 }
 
@@ -50,8 +57,11 @@ void TaskHelper::suspend(Task *t) {
 void TaskHelper::resume(Task *t) {
 	if (isInTaskMode())
 		vTaskResume((xTaskHandle) t->handler);
-	else
-		xTaskResumeFromISR((xTaskHandle) t->handler);
+	else {
+		portBASE_TYPE yReq = xTaskResumeFromISR((xTaskHandle) t->handler);
+		if (yReq != pdFALSE)
+			ISRContext::setNeedResched();
+	}
 }
 
 /**
@@ -83,6 +93,31 @@ unsigned int currentTick(void) {
 		return xTaskGetTickCount();
 	else
 		return xTaskGetTickCountFromISR();
+}
+
+bool ISRContext::needResched = false;
+
+/**
+ * @brief Inform to kernel the entering of ISR
+ *
+ * Call this function on ISR entering
+ * @see ISRContext::leaveISR(void);
+ */
+void ISRContext::enterISR(void) {
+	needResched = false;
+}
+
+/**
+ * @brief Inform to kernel the finalization of ISR
+ *
+ * Call this function on end of ISR
+ * @see ISRContext::leaveISR(void);
+ */
+void ISRContext::leaveISR(void) {
+	if (needResched) {
+		vPortYieldFromISR();
+		needResched = false;
+	}
 }
 
 }

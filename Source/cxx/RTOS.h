@@ -171,6 +171,60 @@ private:
 extern void startRTOS();
 extern void taskWait(int ticks);
 extern unsigned int currentTick(void);
+extern bool isInTaskMode(void);
+
+/**
+ * @brief Interrupt OS context
+ * Create an ISRContext dummy object on any ISR service
+ * for handling enter/exit ISR tasks.
+ *
+ * Or call enterISR/leaveISR on enter/exit section of ISR
+ *
+ * - Example:
+ * @code
+ *     extern "C" void EXTI_IRQ_Handler(void) {
+ *         ISRContext context;
+ *         (void) context;
+ *         // Handle EXTI_IRQ interrupt
+ *     }
+ * @endcode
+ */
+class ISRContext {
+public:
+	/**
+	 * Create ISRContext and call #enterISR() code
+	 */
+	ISRContext() {
+		enterISR();
+	}
+
+	/**
+	 * Destroy ISRContext and call #leaveISR() code
+	 */
+	~ISRContext() {
+		leaveISR();
+	}
+
+	/**
+	 * @brief Perform pre ISR architecture-depend actions
+	 */
+	static void enterISR(void);
+
+	/**
+	 * @brief Perform post ISR architecture-depend actions
+	 */
+	static void leaveISR(void);
+
+	/**
+	 * Inform the need of rescheduling tasks on leaveISR
+	 */
+	static void setNeedResched(void) {
+		needResched = true;
+	}
+
+private:
+	static bool needResched;
+};
 
 }
 

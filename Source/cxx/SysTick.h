@@ -8,9 +8,9 @@
 #ifndef SYSTICK_H_
 #define SYSTICK_H_
 
-namespace CM3 {
-
 #include <stm32f10x.h>
+
+namespace CM3 {
 
 class SystemTick_t: SysTick_Type {
 public:
