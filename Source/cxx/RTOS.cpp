@@ -6,8 +6,11 @@
 
 #include <cstdlib>
 
+#undef IPSR_IN_TASK_METHOD
+
 namespace RTOS {
 
+#ifdef IPSR_IN_TASK_METHOD
 static inline uint32_t get_IPSR(void) {
 	uint32_t ipsr;
 	__asm__ __volatile__("mrs %0, ipsr" :"=r"(ipsr)::);
@@ -15,6 +18,7 @@ static inline uint32_t get_IPSR(void) {
 }
 
 #define EXCEPTION_MASK 0x0000001f
+#endif
 
 /**
  * @brief Determine if processor is in task mode
@@ -24,7 +28,11 @@ static inline uint32_t get_IPSR(void) {
  * @return True if processor is in task mode. False if in handler mode
  */
 bool isInTaskMode(void) {
+#ifdef IPSR_IN_TASK_METHOD
 	return (get_IPSR() & EXCEPTION_MASK) == 0;
+#else
+	return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk);
+#endif
 }
 
 void TaskHelper::trampoline(void *ptr) {

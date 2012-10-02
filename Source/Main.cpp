@@ -23,18 +23,17 @@ RTOS::Task taskLed(Functional::build([]() {
 	}
 }));
 
-RTOS::Task taskUSB(
-		Functional::build([]() {
-			while(1) {
-				usb << USBStream::Config(0, '0', USBStream::DEC);
-				usb << "SYSTICK: " << RTOS::currentTick() << "\r\n";
-				usb << USBStream::Config(8, '0', USBStream::HEX);
-				usb << " PORTB conf.H 0x" << unsigned(PortB.CRH) << "\r\n";
-				usb << " PORTB conf.L 0x" << unsigned(PortB.CRL) << "\r\n";
-				usb << " PORTB[2]=" << PortB.readInputDataBit(GPIO::Pin2) << "\r\n";
-				RTOS::taskWait(1000);
-			}
-		}));
+RTOS::Task taskUSB(Functional::build([]() {
+	while(1) {
+		usb << USBStream::Config(0, '0', USBStream::DEC);
+		usb << "SYSTICK: " << RTOS::currentTick() << "\r\n";
+		usb << USBStream::Config(8, '0', USBStream::HEX);
+		usb << " PORTB conf.H 0x" << unsigned(PortB.CRH) << "\r\n";
+		usb << " PORTB conf.L 0x" << unsigned(PortB.CRL) << "\r\n";
+		usb << " PORTB[2]=" << PortB.readInputDataBit(GPIO::Pin2) << "\r\n";
+		RTOS::taskWait(1000);
+	}
+}));
 
 int main() {
 	RTOS::startRTOS();
