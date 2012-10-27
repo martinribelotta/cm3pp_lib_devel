@@ -12,7 +12,7 @@ namespace Stream {
 /**
  * @brief Base class of serial stream
  */
-class AbstractStream {
+class AbstractWriteStream {
 protected:
 	virtual void write(char c) = 0;
 
@@ -58,53 +58,53 @@ public:
 		}
 	};
 
-	AbstractStream() :
+	AbstractWriteStream() :
 			m_width(0), m_fill(' '), m_radix(DEC) {
 	}
 
-	virtual ~AbstractStream() {
+	virtual ~AbstractWriteStream() {
 	}
 
-	inline AbstractStream& operator<<(const char *str) {
+	inline AbstractWriteStream& operator<<(const char *str) {
 		write(str);
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(char c) {
+	inline AbstractWriteStream& operator<<(char c) {
 		write(c);
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(int n) {
+	inline AbstractWriteStream& operator<<(int n) {
 		print(n);
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(unsigned int n) {
+	inline AbstractWriteStream& operator<<(unsigned int n) {
 		print(n);
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(Radix_t radix) {
+	inline AbstractWriteStream& operator<<(Radix_t radix) {
 		m_radix = radix;
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(FillChar c) {
+	inline AbstractWriteStream& operator<<(FillChar c) {
 		m_fill = c.fill;
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(Width w) {
+	inline AbstractWriteStream& operator<<(Width w) {
 		m_width = w.width;
 		return *this;
 	}
 
-	inline AbstractStream& operator<<(bool b) {
+	inline AbstractWriteStream& operator<<(bool b) {
 		return *this << (b? "true" : "false");
 	}
 
-	inline AbstractStream& operator<<(Config c) {
+	inline AbstractWriteStream& operator<<(Config c) {
 		m_width = c.m_width;
 		m_fill = c.m_fill;
 		m_radix = c.m_radix;

@@ -5,13 +5,13 @@
  *      Author: ruso
  */
 
-#include "Stream.h"
+#include "WriteStream.h"
 
 namespace Stream {
 
 static const char DIGIT_TABLE[] = "0123456789ABCDEF";
 
-void AbstractStream::print(unsigned int value, unsigned int deep) {
+void AbstractWriteStream::print(unsigned int value, unsigned int deep) {
 	if (value >= m_radix)
 		print(value / m_radix, deep + 1);
 	else
@@ -20,7 +20,7 @@ void AbstractStream::print(unsigned int value, unsigned int deep) {
 	write(DIGIT_TABLE[(value % m_radix)]);
 }
 
-void AbstractStream::print(int value) {
+void AbstractWriteStream::print(int value) {
 	if (value < 0) {
 		write('-');
 		value = -value;

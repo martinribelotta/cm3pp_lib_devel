@@ -8,12 +8,12 @@
 #ifndef USBSTREAM_H_
 #define USBSTREAM_H_
 
-#include "Stream.h"
+#include "WriteStream.h"
 #include <usbd_cdc_vcp.h>
 
 namespace Stream {
 
-class USBStream: public AbstractStream {
+class USBUpStream: public AbstractWriteStream {
 protected:
 	virtual void write(char c) {
 		usb_cdc_putc(c);
@@ -24,15 +24,15 @@ protected:
 	}
 
 private:
-	USBStream() {
+	USBUpStream() {
 		usb_cdc_open();
 	}
 
 public:
-	static USBStream singleton;
+	static USBUpStream singleton;
 };
 
-static USBStream& usb = USBStream::singleton;
+static USBUpStream& usbup = USBUpStream::singleton;
 
 }
 

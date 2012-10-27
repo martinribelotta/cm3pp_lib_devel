@@ -2,6 +2,6 @@
 
 namespace Stream {
 
-USBStream USBStream::singleton;
+USBUpStream USBUpStream::singleton;
 
 }

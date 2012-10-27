@@ -19,18 +19,18 @@ RTOS::Task taskLed(Functional::build([]() {
 		// It is bad!!! (not reentrant code of streams)
 		// But not crash for two days.
 		// Anyway... a cat is fine too
-		usb << "led loop\r\n";
+		usbup << "led loop\r\n";
 	}
 }));
 
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
-		usb << USBStream::Config(0, '0', USBStream::DEC);
-		usb << "SYSTICK: " << RTOS::currentTick() << "\r\n";
-		usb << USBStream::Config(8, '0', USBStream::HEX);
-		usb << " PORTB conf.H 0x" << unsigned(PortB.CRH) << "\r\n";
-		usb << " PORTB conf.L 0x" << unsigned(PortB.CRL) << "\r\n";
-		usb << " PORTB[2]=" << PortB.readInputDataBit(GPIO::Pin2) << "\r\n";
+		usbup << USBUpStream::Config(0, '0', USBUpStream::DEC);
+		usbup << "SYSTICK: " << RTOS::currentTick() << "\r\n";
+		usbup << USBUpStream::Config(8, '0', USBUpStream::HEX);
+		usbup << " PORTB conf.H 0x" << unsigned(PortB.CRH) << "\r\n";
+		usbup << " PORTB conf.L 0x" << unsigned(PortB.CRL) << "\r\n";
+		usbup << " PORTB[2]=" << PortB.readInputDataBit(GPIO::Pin2) << "\r\n";
 		RTOS::taskWait(1000);
 	}
 }));
