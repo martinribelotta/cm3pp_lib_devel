@@ -93,6 +93,13 @@ void taskWait(int ticks) {
 }
 
 /**
+ * @brief Causes the current task yield the processor
+ */
+void taskYield(void) {
+	taskYIELD();
+}
+
+/**
  * @brief Obtain the current tick of OS
  * @return Current time tick
  */

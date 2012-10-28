@@ -170,6 +170,7 @@ private:
 
 extern void startRTOS();
 extern void taskWait(int ticks);
+extern void taskYield(void);
 extern unsigned int currentTick(void);
 extern bool isInTaskMode(void);
 

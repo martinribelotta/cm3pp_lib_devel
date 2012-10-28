@@ -168,6 +168,7 @@ void OTG_FS_IRQHandler(void) {
 }
 
 int usb_cdc_open(void) {
+	rb_init(&ring_rx, sizeof(ring_buffer_rx), ring_buffer_rx);
 	USBD_Init(&USB_OTG_dev, USB_OTG_FS_CORE_ID, &USR_desc, &USBD_CDC_cb,
 			&USR_cb);
 	return 0;
@@ -196,7 +197,7 @@ int usb_cdc_read(char *buf, size_t cnt) {
 }
 
 int usb_cdc_getc(char *c) {
-	if (rb_is_empty(&ring_rx)) {
+	if (!rb_is_empty(&ring_rx)) {
 		if (c)
 			*c = rb_remove(&ring_rx);
 		return 0;

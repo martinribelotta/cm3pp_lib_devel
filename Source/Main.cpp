@@ -3,6 +3,12 @@
 #include <cxx/USBStream.h>
 #include <cxx/Functional.h>
 
+#include <cxx/LineReader.h>
+
+#include <usbd_cdc_vcp.h>
+
+#include <cctype>
+
 using namespace STM32;
 using namespace Stream;
 
@@ -16,22 +22,26 @@ RTOS::Task taskLed(Functional::build([]() {
 		RTOS::taskWait(100);
 		PortB.resetBits(GPIO::Pin11);
 		RTOS::taskWait(100);
-		// It is bad!!! (not reentrant code of streams)
-		// But not crash for two days.
-		// Anyway... a cat is fine too
-		usbup << "led loop\r\n";
 	}
 }));
 
+static Stream::LineReader<128, 10, usb_cdc_getc, usb_cdc_putc> lineReader;
+
+void execute(args_t args) {
+	usbup << "argc " << args.count() << "\n";
+	for (int i = 0; i < args.count(); i++)
+		usbup << '\'' << args[i] << "'\n";
+}
+
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
-		usbup << USBUpStream::Config(0, '0', USBUpStream::DEC);
-		usbup << "SYSTICK: " << RTOS::currentTick() << "\r\n";
-		usbup << USBUpStream::Config(8, '0', USBUpStream::HEX);
-		usbup << " PORTB conf.H 0x" << unsigned(PortB.CRH) << "\r\n";
-		usbup << " PORTB conf.L 0x" << unsigned(PortB.CRL) << "\r\n";
-		usbup << " PORTB[2]=" << PortB.readInputDataBit(GPIO::Pin2) << "\r\n";
-		RTOS::taskWait(1000);
+		usbup << "ready: ";
+		while (!lineReader.read()) {
+			RTOS::taskYield();
+		}
+		if (lineReader.parse()>0) {
+			execute(lineReader.args());
+		}
 	}
 }));
 

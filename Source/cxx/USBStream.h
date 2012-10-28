@@ -9,6 +9,7 @@
 #define USBSTREAM_H_
 
 #include "WriteStream.h"
+#include "ReadStream.h"
 #include <usbd_cdc_vcp.h>
 
 namespace Stream {
@@ -32,7 +33,26 @@ public:
 	static USBUpStream singleton;
 };
 
+class USBDownStream: public AbstractReadStream {
+protected:
+	virtual bool read(char *c) {
+		return usb_cdc_getc(c) != -1;
+	}
+
+	virtual int read(char *ptr, int size) {
+		return usb_cdc_read(ptr, size);
+	}
+
+private:
+	USBDownStream() {
+	}
+
+public:
+	static USBDownStream singleton;
+};
+
 static USBUpStream& usbup = USBUpStream::singleton;
+static USBDownStream& usbdown = USBDownStream::singleton;
 
 }
 
