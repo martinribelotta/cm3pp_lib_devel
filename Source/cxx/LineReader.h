@@ -29,7 +29,7 @@ struct args_t {
 	}
 };
 
-template<int buflen, int maxargs, int getch(char *c), int putch(char c)>
+template<int getch(char *c), int putch(char c), int buflen=128, int maxargs=10>
 class LineReader {
 public:
 	LineReader() :
