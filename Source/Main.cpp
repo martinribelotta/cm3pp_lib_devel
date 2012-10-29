@@ -25,13 +25,13 @@ RTOS::Task taskLed(Functional::build([]() {
 	}
 }));
 
-static Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
-
 void execute(args_t args) {
 	usbup << "argc " << args.count() << "\n";
 	for (int i = 0; i < args.count(); i++)
 		usbup << '\'' << args[i] << "'\n";
 }
+
+static Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
 
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
