@@ -7,7 +7,7 @@ namespace CM3 {
 
 namespace Atomic {
 
-inline uint8_t atomic_fetch_and_add(uint8_t n, uint8_t *ptr) {
+inline uint8_t fetch_and_add(uint8_t n, uint8_t *ptr) {
 	uint8_t v;
 	do {
 		v = __LDREXB(ptr);
@@ -15,7 +15,7 @@ inline uint8_t atomic_fetch_and_add(uint8_t n, uint8_t *ptr) {
 	return v;
 }
 
-inline uint16_t atomic_fetch_and_add(uint16_t n, uint16_t *ptr) {
+inline uint16_t fetch_and_add(uint16_t n, uint16_t *ptr) {
 	uint16_t v;
 	do {
 		v = __LDREXH(ptr);
@@ -23,7 +23,7 @@ inline uint16_t atomic_fetch_and_add(uint16_t n, uint16_t *ptr) {
 	return v;
 }
 
-inline uint32_t atomic_fetch_and_add(uint32_t n, uint32_t *ptr) {
+inline uint32_t fetch_and_add(uint32_t n, uint32_t *ptr) {
 	uint32_t v;
 	do {
 		v = __LDREXW(ptr);
@@ -31,7 +31,7 @@ inline uint32_t atomic_fetch_and_add(uint32_t n, uint32_t *ptr) {
 	return v;
 }
 
-inline uint8_t atomic_fetch_and_sub(uint8_t n, uint8_t *ptr) {
+inline uint8_t fetch_and_sub(uint8_t n, uint8_t *ptr) {
 	uint8_t v;
 	do {
 		v = __LDREXB(ptr);
@@ -39,7 +39,7 @@ inline uint8_t atomic_fetch_and_sub(uint8_t n, uint8_t *ptr) {
 	return v;
 }
 
-inline uint16_t atomic_fetch_and_sub(uint16_t n, uint16_t *ptr) {
+inline uint16_t fetch_and_sub(uint16_t n, uint16_t *ptr) {
 	uint16_t v;
 	do {
 		v = __LDREXH(ptr);
@@ -47,7 +47,7 @@ inline uint16_t atomic_fetch_and_sub(uint16_t n, uint16_t *ptr) {
 	return v;
 }
 
-inline uint32_t atomic_fetch_and_sub(uint32_t n, uint32_t *ptr) {
+inline uint32_t fetch_and_sub(uint32_t n, uint32_t *ptr) {
 	uint32_t v;
 	do {
 		v = __LDREXW(ptr);
@@ -56,13 +56,13 @@ inline uint32_t atomic_fetch_and_sub(uint32_t n, uint32_t *ptr) {
 }
 
 template<typename T>
-T atomic_fetch_and_inc(T *ptr) {
-	return atomic_fetch_and_add(1, ptr);
+T fetch_and_inc(T *ptr) {
+	return fetch_and_add(1, ptr);
 }
 
 template<typename T>
-T atomic_fetch_and_dec(T *ptr) {
-	return atomic_fetch_and_sub(1, ptr);
+T fetch_and_dec(T *ptr) {
+	return fetch_and_sub(1, ptr);
 }
 
 } /* namespace Atomic */
