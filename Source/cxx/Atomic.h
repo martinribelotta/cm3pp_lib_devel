@@ -6,9 +6,9 @@
 namespace CM3 {
 
 /**
- * @brief Atomic processor-based operations
+ * @brief Atomic-processor-based operations
  *
- * Atomic operations based only on ARM-v7m capabilities
+ * operations based only on ARM-v7m capabilities
  */
 namespace Atomic {
 
@@ -103,6 +103,149 @@ inline void dataSyncBarrier(void) {
  */
 inline void instructionBarrier(void) {
 	__ISB();
+}
+
+/**
+ * @brief Default yield functors
+ *
+ * The functors over this namespace provide default
+ * actions to yield the processor on blocking mutex
+ * lock fail
+ *
+ * @see BlockingMutex
+ * @see BlockingMutex::lock
+ */
+namespace Yield {
+
+class Functor {
+};
+
+/**
+ * @brief No operation yield functor
+ *
+ * This yield functor execute nop instruction when is called
+ *
+ * The natural companion for this yield functor is Notify::Noop
+ */
+class Noop: public Functor {
+public:
+	inline void operator()(void) {
+		__NOP();
+	}
+};
+
+/**
+ * @brief Wait for interrupt yield functor
+ *
+ * This yield functor wait for interrupt when is called
+ *
+ * @warning To unlock the processor need generate some interrupt
+ * @see Notify::SVC
+ * @see Notify::PendSV
+ */
+class IntWait: public Functor {
+public:
+	inline void operator()(void) {
+		__WFI();
+	}
+};
+
+/**
+ * @brief Wait for event yield functor
+ *
+ * This yield functor wait for event when is called
+ *
+ * @warning To unlock the processor need generate some event
+ * @see Notify::Event
+ */
+class Event: public Functor {
+public:
+	inline void operator()(void) {
+		__WFE();
+	}
+};
+
+}
+
+/**
+ * @brief Default notify functors
+ *
+ * The functors over this namespace provide default
+ * actions to notify the processor on blocking mutex
+ * unlock function
+ *
+ * @see BlockingMutex
+ * @see BlockingMutex::unlock
+ */
+namespace Notify {
+
+class Functor {
+};
+
+/**
+ * @brief No operation notify functor
+ *
+ * No operation is performed when this notify functor is called
+ *
+ * Natural yield functor companion is Yield::Noop
+ */
+class Noop: public Functor {
+public:
+	inline void operator()(void) {
+		__NOP();
+	}
+};
+
+/**
+ * @brief Supervisor Call notify functor
+ *
+ * Generate a supervisor call interrupt when it is called
+ *
+ * This is one method to generate interruption event for
+ * yield functor Yield::IntWait
+ *
+ * @see Notify::PendSV
+ */
+class SVC: public Functor {
+public:
+	inline void operator()(void) {
+		__asm__ __volatile__("svc");
+	}
+};
+
+/**
+ * @brief Pending interrupt notify functor
+ *
+ * Generate a pending interrupt when it is called
+ *
+ * This is one method to generate interruption event for
+ * yield functor Yield::IntWait
+ *
+ * @see Notify::SVC
+ */
+class PendSV: public Functor {
+public:
+	inline void operator()(void) {
+		// trigger PendSV
+		*((uint32_t volatile *)0xE000ED04) = 0x10000000;
+	}
+};
+
+/**
+ * @brief Event send notify functor
+ *
+ * Send event to the processor when it is called
+ *
+ * This is one method to generate event for Yield::Event
+ * yield functor
+ */
+class Event: public Functor {
+public:
+	inline void operator()(void) {
+		__SEV();
+	}
+};
+
 }
 
 }
@@ -284,7 +427,7 @@ public:
 	 * @return True if mutex can obtained
 	 * @return False if not obtain mutex
 	 */
-	bool tryLock() {
+	inline bool tryLock() {
 		uint8_t old;
 		if (try_get_and_set(&value, uint8_t(LOCK), &old))
 			return old == UNLOCK;
@@ -296,8 +439,66 @@ public:
 	 * @warning This function can't test if unlock-caller is
 	 * the mutex obtainer.
 	 */
-	void unlock() {
+	inline void unlock() {
 		value = UNLOCK;
+	}
+};
+
+/**
+ * @brief Blocking mutex version
+ *
+ * This version of mutex can block thread using specific yield function
+ *
+ * @tparam m_yield Function to implement yield (nop by default)
+ * @tparam m_notify Function to notify unlock action (nop by default)
+ *
+ * Some useful m_yield and m_notify implementations are over Implementation::Yield
+ * and Implementation::Notify namespace
+ *
+ */
+template<Implementation::Yield::Functor m_yield = Implementation::Yield::Noop,
+		Implementation::Notify::Functor m_notify = Implementation::Notify::Noop>
+class BlockingMutex {
+	Mutex m;
+/*
+ * The basic yield function provides is:
+ * @li @c Implementation::Yield::Noop No operation (asm nop) while mutex can't locked
+ * @li @c Implementation::Yield::IntWait Wait for interrupt while mutex can't locked
+ * @li @c Implementation::Yield::EventWait Wait for event while mutex can't locked
+ *
+ * The basic motify function provides is:
+ * @li @c Implementation::Notify::Noop No operation (asm nop) for notify action
+ * @li @c Implementation::Notify::SVC Generate supervisor call (asm svn) on notify action
+ * @li @c Implementation::Notify::PendSV Generate PendSV call on notify action
+ * @li @c Implementation::Notify::Event Generate send event (asm sev) on notify action
+ *
+ */
+public:
+	/**
+	 * @brief Try to obtain mutex
+	 * @return True if mutex can obtained
+	 * @return False if not obtain mutex
+	 */
+	inline bool tryLock() {
+		return m.tryLock();
+	}
+
+	/**
+	 * @brief Obtain the mutex, block while not obtain
+	 */
+	inline void lock() {
+		while (tryLock())
+			m_yield();
+	}
+
+	/**
+	 * @brief unlock locked mutex
+	 *
+	 * Unlock mutex and notify other thread via m_notify
+	 */
+	inline void unlock() {
+		m.unlock();
+		m_notify();
 	}
 };
 
