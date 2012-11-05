@@ -3,7 +3,7 @@
 
 #include <core_cmInstr.h>
 
-namespace CM3 {
+namespace ARMV7M {
 
 /**
  * @brief Atomic-processor-based operations
@@ -112,8 +112,8 @@ inline void instructionBarrier(void) {
  * actions to yield the processor on blocking mutex
  * lock fail
  *
- * @see BlockingMutex
- * @see BlockingMutex::lock
+ * @see MutexBlocking
+ * @see MutexBlocking::lock
  */
 namespace Yield {
 
@@ -174,8 +174,8 @@ public:
  * actions to notify the processor on blocking mutex
  * unlock function
  *
- * @see BlockingMutex
- * @see BlockingMutex::unlock
+ * @see MutexBlocking
+ * @see MutexBlocking::unlock
  */
 namespace Notify {
 
@@ -403,11 +403,10 @@ inline bool try_get_and_set(T *ptr, T new_value, T *old_value) {
  *
  * Because this class can't know to yield processor to other threads
  * only non-block primitives is implemented.
- *
  * Additionally, #unlock primitive is unsafe if used over a
  * non-obtained mutex
  */
-class Mutex {
+class MutexUnblocking {
 	uint8_t value;
 public:
 	enum {
@@ -418,7 +417,7 @@ public:
 	/**
 	 * @brief Create an unlocked mutex
 	 */
-	Mutex() :
+	MutexUnblocking() :
 			value(UNLOCK) {
 	}
 
@@ -458,21 +457,8 @@ public:
  */
 template<Implementation::Yield::Functor m_yield = Implementation::Yield::Noop,
 		Implementation::Notify::Functor m_notify = Implementation::Notify::Noop>
-class BlockingMutex {
-	Mutex m;
-/*
- * The basic yield function provides is:
- * @li @c Implementation::Yield::Noop No operation (asm nop) while mutex can't locked
- * @li @c Implementation::Yield::IntWait Wait for interrupt while mutex can't locked
- * @li @c Implementation::Yield::EventWait Wait for event while mutex can't locked
- *
- * The basic motify function provides is:
- * @li @c Implementation::Notify::Noop No operation (asm nop) for notify action
- * @li @c Implementation::Notify::SVC Generate supervisor call (asm svn) on notify action
- * @li @c Implementation::Notify::PendSV Generate PendSV call on notify action
- * @li @c Implementation::Notify::Event Generate send event (asm sev) on notify action
- *
- */
+class MutexBlocking {
+	MutexUnblocking m;
 public:
 	/**
 	 * @brief Try to obtain mutex
@@ -484,10 +470,10 @@ public:
 	}
 
 	/**
-	 * @brief Obtain the mutex, block while not obtain
+	 * @brief Obtain the mutex, block while can not obtain
 	 */
 	inline void lock() {
-		while (tryLock())
+		while (!tryLock())
 			m_yield();
 	}
 

@@ -7,7 +7,7 @@
 
 #include "SysTick.h"
 
-namespace CM3 {
+namespace ARMV7M {
 
 volatile int SystemTick_t::m_current_tick = 0;
 
@@ -19,6 +19,6 @@ inline void SysTick_Handler_cpp(void) {
 
 #ifndef RTOS_ENABLED
 extern "C" void SysTick_Handler(void) {
-	CM3::SysTick_Handler_cpp();
+	ARMV7M::SysTick_Handler_cpp();
 }
 #endif

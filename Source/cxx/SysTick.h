@@ -10,7 +10,7 @@
 
 #include <stm32f10x.h>
 
-namespace CM3 {
+namespace ARMV7M {
 
 class SystemTick_t: SysTick_Type {
 public:
