@@ -143,6 +143,7 @@ SECTIONS
   PROVIDE ( _end = _ebss );
 
   /* User_heap_stack section, used to check that there is enough RAM left */
+  /*
   ._user_heap_stack :
   {
     . = ALIGN(4);
@@ -150,6 +151,7 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(4);
   } >RAM
+  */
 
   /* MEMORY_bank1 section, code must be located here explicitly            */
   /* Example: extern int foo(void) __attribute__ ((section (".mb1text"))); */

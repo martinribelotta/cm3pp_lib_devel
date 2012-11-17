@@ -7,8 +7,6 @@
 
 #include <usbd_cdc_vcp.h>
 
-#include <cctype>
-
 using namespace STM32;
 using namespace Stream;
 
@@ -25,23 +23,17 @@ RTOS::Task taskLed(Functional::build([]() {
 	}
 }));
 
-void execute(args_t args) {
-	usbup << "argc " << args.count() << "\n";
-	for (int i = 0; i < args.count(); i++)
-		usbup << '\'' << args[i] << "'\n";
-}
+extern void execute(int argc, const char **argv);
 
 static Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
 
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
 		usbup << "ready: ";
-		while (!lineReader.read()) {
+		while (!lineReader.read())
 			RTOS::taskYield();
-		}
-		if (lineReader.parse()>0) {
-			execute(lineReader.args());
-		}
+		if (lineReader.parse()>0)
+			execute(lineReader.args().argc, lineReader.args().argv);
 	}
 }));
 
