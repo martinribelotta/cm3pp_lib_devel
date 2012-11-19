@@ -27,7 +27,17 @@ struct entry_t {
 
 extern "C" int tinybasic_interpreter(int argc, const char* argv[]);
 
-static entry_t entries[] = { { "basic", tinybasic_interpreter } };
+int cmd_help(int argc, const char* argv[]) {
+	(void) argc;
+	(void) argv;
+	interpreter_putln("FUAAAAAAAAAAAA!!!");
+	return 0;
+}
+
+static entry_t entries[] = { //
+		{ "basic", tinybasic_interpreter },
+		{ "help", cmd_help }
+};
 
 template<typename T, int size>
 int GetArrLength(T (&)[size]) {

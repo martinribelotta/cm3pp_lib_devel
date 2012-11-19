@@ -4,6 +4,7 @@
 #include <cxx/Functional.h>
 
 #include <cxx/LineReader.h>
+#include <cxx/CmdLineParser.h>
 
 #include <usbd_cdc_vcp.h>
 
@@ -23,17 +24,22 @@ RTOS::Task taskLed(Functional::build([]() {
 	}
 }));
 
-extern void execute(int argc, const char **argv);
+extern int execute(int argc, const char **argv);
 
 static Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
 
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
 		usbup << "ready: ";
-		while (!lineReader.read())
+		lineReader.reset();
+		while (!lineReader.poll())
 			RTOS::taskYield();
-		if (lineReader.parse()>0)
-			execute(lineReader.args().argc, lineReader.args().argv);
+		CmdLineParser<10> args(lineReader.text());
+#if 0
+		for(int i=0; i<args.argc(); i++)
+			usbup << "arg[" <<i<<"] " << args[i] << "\n";
+#endif
+		execute(args.argc(), args.argv());
 	}
 }));
 

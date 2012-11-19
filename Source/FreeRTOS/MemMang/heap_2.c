@@ -83,6 +83,7 @@ static union xRTOS_HEAP
 	unsigned char ucHeap[ configTOTAL_HEAP_SIZE ];
 } xHeap;
 
+
 /* Define the linked list structure.  This is used to link free blocks in order
 of their size. */
 typedef struct A_BLOCK_LINK

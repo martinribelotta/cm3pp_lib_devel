@@ -13,50 +13,6 @@
 namespace Stream {
 
 /**
- * @brief Line reader argument result
- * Argument bundled with count and vector of parsed arguments
- * @see LineReader
- */
-struct args_t {
-	int argc; /**< @brief Argument counter */
-	const char ** const argv; /**< @brief Vector of arguments */
-
-	/**
-	 * @brief Create an argument bundled
-	 * @param v Pointer of preallocated argument vector
-	 */
-	args_t(const char ** const v) :
-			argc(0), argv(v) {
-	}
-
-	/**
-	 * @brief Count of arguments in vector
-	 * @return Current argc value
-	 */
-	inline const int count() const {
-		return argc;
-	}
-
-	/**
-	 * @brief Access an element in the vector of arguments
-	 * @warning This function not check index bound
-	 * @param n Number of argument to access
-	 * @return Pointer to text argument
-	 */
-	inline const char *operator[](int n) const {
-		return argv[n];
-	}
-
-	/**
-	 * @brief Verify if the argument block is null
-	 * @return True if argument block not contains any arguments
-	 */
-	inline bool isNull() const {
-		return argc == 0;
-	}
-};
-
-/**
  * @brief Template of function to get character from input
  * @param[out] cptr Pointer to character variable for store the reader char (can be null)
  * @return Zero if character is read, non zero if not have character
@@ -85,17 +41,17 @@ typedef int (LineReader_putch)(char c);
 template<LineReader_getch getch, LineReader_putch putch, int buflen = 128,
 		int maxargs = 10>
 class LineReader {
+private:
+	int idx;
+	char buffer[buflen];
+
 public:
 	LineReader() :
-			idx(0), ptr(buffer), m_args(buf_argv) {
+			idx(0) //
+	{
 	}
 
-	/**
-	 * @brief Restart the parser and clear the buffer
-	 */
-	inline void reset() {
-		ptr = buffer;
-		m_args.argc = 0;
+	void reset() {
 		idx = 0;
 	}
 
@@ -112,7 +68,7 @@ public:
 	 * @return False if line editing is in progress, true if line end is detected
 	 * @see parse
 	 */
-	bool read() {
+	bool poll() {
 		char c;
 		if (getch(&c) != -1) {
 			switch (c) {
@@ -127,7 +83,6 @@ public:
 			case '\n':
 				putch('\r');
 				putch('\n');
-				reset();
 				return true;
 			default:
 				if (idx < buflen)
@@ -140,81 +95,11 @@ public:
 	}
 
 	/**
-	 * @brief Parse readed line and build argc/argv
-	 *
-	 * Perform a string parsing over a previous readed line
-	 * with #read function and build argc/argv pairs
-	 *
-	 * @return Numbers of arguments founds (argc)
-	 * @see argv
-	 * @see argc
-	 * @see args
-	 */
-	int parse() {
-		char *ptr = buffer;
-		while (*ptr) {
-			char *token = skipblanks(ptr);
-			if (*token != '\0') {
-				m_args.argv[m_args.argc++] = token;
-				ptr = skiptoken(token);
-				if (*ptr)
-					*ptr++ = '\0';
-			} else
-				break;
-		}
-		return argc();
-	}
-
-	/**
-	 * @brief Return current arguments (counter and array of strings)
-	 * @return Parsed arguments
-	 */
-	inline const args_t& args() const {
-		return m_args;
-	}
-
-	/**
-	 * @brief Return current argument strings vector
-	 * @return Pointer to argument vector
-	 */
-	inline const char * const * const argv() const {
-		return m_args.argv;
-	}
-
-	/**
-	 * @brief Return current argument counter
-	 * @return Number of arguments parsed
-	 */
-	inline const int argc() const {
-		return m_args.argc;
-	}
-
-	/**
 	 * @brief Return current text line readed
 	 * @return Pointer to text line
 	 */
-	inline const char *text() const {
+	inline char *text() {
 		return buffer;
-	}
-
-private:
-	int idx;
-	char *ptr;
-	args_t m_args;
-
-	char buffer[buflen];
-	const char *buf_argv[maxargs];
-
-	static inline char *skipblanks(char *ptr) {
-		while (*ptr && std::isspace(*ptr))
-			ptr++;
-		return ptr;
-	}
-
-	static inline char *skiptoken(char *ptr) {
-		while (*ptr && !std::isspace(*ptr))
-			ptr++;
-		return ptr;
 	}
 };
 

@@ -26,6 +26,7 @@ extern int errno;
 
 extern int errno;
 extern int _end;
+
 caddr_t _sbrk(int incr) {
 
 	static unsigned char *heap = NULL;
@@ -38,6 +39,12 @@ caddr_t _sbrk(int incr) {
 	heap += incr;
 	return (caddr_t) prev_heap;
 }
+
+#if 0
+void *_sbrk_r (struct _reent *r, ptrdiff_t incr) {
+	return _sbrk(incr);
+}
+#endif
 
 void _exit(int status) {
 	// xprintf("_exit called with parameter %d\n", status);

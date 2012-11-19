@@ -32,7 +32,7 @@ typedef short unsigned LINENUM;
 
 /***********************************************************/
 // Keyword table and constants - the last character has 0x80 added to it
-static unsigned char keywords[] = { //
+static unsigned const char keywords[] = { //
 		'L', 'I', 'S', 'T' + 0x80, //
 		'L', 'O', 'A', 'D' + 0x80, //
 		'N', 'E', 'W' + 0x80, //
@@ -93,7 +93,7 @@ struct stack_gosub_frame {
 	unsigned char *txtpos;
 };
 
-static unsigned char func_tab[] = { //
+static unsigned const char func_tab[] = { //
 		'P', 'E', 'E', 'K' + 0x80, //
 		'A', 'B', 'S' + 0x80, //
 		'D', 'I', 'N' + 0x80, //
@@ -110,11 +110,11 @@ static unsigned char func_tab[] = { //
 #define FUNC_READTEMP  6
 #define FUNC_UNKNOWN 7
 
-static unsigned char to_tab[] = { 'T', 'O' + 0x80, 0 };
+static unsigned const char to_tab[] = { 'T', 'O' + 0x80, 0 };
 
-static unsigned char step_tab[] = { 'S', 'T', 'E', 'P' + 0x80, 0 };
+static unsigned const char step_tab[] = { 'S', 'T', 'E', 'P' + 0x80, 0 };
 
-static unsigned char relop_tab[] = { '>', '=' + 0x80, '<', '>' + 0x80, '>'
+static unsigned const char relop_tab[] = { '>', '=' + 0x80, '<', '>' + 0x80, '>'
 		+ 0x80, '=' + 0x80, '<', '=' + 0x80, '<' + 0x80, 0 };
 
 #define RELOP_GE		0
@@ -142,18 +142,18 @@ static unsigned char *sp;
 static unsigned char table_index;
 static LINENUM linenum;
 
-static const char okmsg[] = "OK";
-static const char badlinemsg[] = "Invalid line number";
-static const char invalidexprmsg[] = "Invalid expression";
-static const char syntaxmsg[] = "Syntax Error";
-static const char badinputmsg[] = "\nBad number";
-static const char nomemmsg[] = "Not enough memory!";
-static const char initmsg[] = "NanoBasic in C";
-static const char memorymsg[] = " bytes free.";
-static const char breakmsg[] = "break!";
-static const char stackstuffedmsg[] = "Stack is stuffed!\n";
-static const char unimplimentedmsg[] = "Unimplemented";
-static const char backspacemsg[] = "\b \b";
+#define okmsg "OK"
+#define badlinemsg "Invalid line number"
+#define invalidexprmsg "Invalid expression"
+#define syntaxmsg "Syntax Error"
+#define badinputmsg "\nBad number"
+#define nomemmsg "Not enough memory!"
+#define initmsg "NanoBasic in C"
+#define memorymsg " bytes free."
+#define breakmsg "break!"
+#define stackstuffedmsg "Stack is stuffed!\n"
+#define unimplimentedmsg "Unimplemented"
+#define backspacemsg "\b \b"
 
 static int getTempInt();
 static int inchar(void);
@@ -168,7 +168,7 @@ static void ignore_blanks(void) {
 }
 
 /***************************************************************************/
-static void scantable(unsigned char *table) {
+static void scantable(unsigned const char *table) {
 	int i = 0;
 	ignore_blanks();
 	table_index = 0;
@@ -726,10 +726,12 @@ static int tinybasic_loop() {
 	line_terminator();
 	goto prompt;
 
-	stackstuffed: printmsg(stackstuffedmsg);
+	stackstuffed:
+	printmsg(stackstuffedmsg);
 	goto warmstart;
 
-	nomem: printmsg(nomemmsg);
+	nomem:
+	printmsg(nomemmsg);
 	goto warmstart;
 
 	run_next_statement: while (*txtpos == ':')
