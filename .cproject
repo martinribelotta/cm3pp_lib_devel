@@ -86,7 +86,8 @@
 								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.gcsections.1547108463" name="Remove unused sections (-Xlinker --gc-sections)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.gcsections" value="true" valueType="boolean"/>
 								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nostdlibs.950287488" name="No startup or default libs (-nostdlib)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nostdlibs" value="false" valueType="boolean"/>
 								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nostart.1772259375" name="Do not use standard start files (-nostartfiles)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nostart" value="true" valueType="boolean"/>
-								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nodeflibs.882992462" name="Do not use default libraries (-nodefaultlibs)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nodeflibs" value="false" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nodeflibs.882992462" name="Do not use default libraries (-nodefaultlibs)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nodeflibs" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.libs.1826991506" name="Libraries (-l)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.libs"/>
 								<inputType id="org.eclipse.cdt.cross.arm.gnu.cpp.linker.input.478432901" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -101,7 +102,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/FreeRTOS/MemMang/heap_2.c|Source/FreeRTOS/MemMang/heap_1.c|STM32F10x_StdPeriph_Lib/Utilities" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/scripts/jimtcl|Source/scripts/jimtcl/jimsh.c|Source/scripts/jimtcl/jim-readline.c|Source/scripts/jimtcl/jim-readdir.c|Source/scripts/jimtcl/jim-posix.c|Source/scripts/jimtcl/jim-hwio.c|Source/scripts/jimtcl/jim-eventloop.h|Source/scripts/jimtcl/jim-eventloop.c|Source/scripts/jimtcl/jim-aio.c|Source/FreeRTOS/MemMang/heap_2.c|Source/FreeRTOS/MemMang/heap_1.c|STM32F10x_StdPeriph_Lib/Utilities" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -152,7 +153,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/FreeRTOS/MemMang/heap_2.c|Source/FreeRTOS/MemMang/heap_1.c|STM32F10x_StdPeriph_Lib/Utilities" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/scripts/jimtcl|Source/scripts/jimtcl/jimsh.c|Source/scripts/jimtcl/jim-readline.c|Source/scripts/jimtcl/jim-readdir.c|Source/scripts/jimtcl/jim-posix.c|Source/scripts/jimtcl/jim-hwio.c|Source/scripts/jimtcl/jim-eventloop.h|Source/scripts/jimtcl/jim-eventloop.c|Source/scripts/jimtcl/jim-aio.c|Source/FreeRTOS/MemMang/heap_2.c|Source/FreeRTOS/MemMang/heap_1.c|STM32F10x_StdPeriph_Lib/Utilities" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

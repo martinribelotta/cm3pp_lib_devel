@@ -1,4 +1,8 @@
 #include <usbd_cdc_vcp.h>
+#include <cstring>
+#include <cxx/LineReader.h>
+
+#include "builtins.h"
 
 extern "C" char interpreter_getchar(void) {
 	char c = -1;
@@ -15,6 +19,16 @@ void interpreter_puts(const char *s) {
 		interpreter_putchar(*s++);
 }
 
+extern Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
+
+extern "C" int interpreter_readline(char *buf, size_t maxlen) {
+	lineReader.reset();
+	while(!lineReader.poll())
+		;
+	std::strncpy(buf, lineReader.text(), maxlen);
+	return std::strlen(buf);
+}
+
 void interpreter_putln(const char *s) {
 	interpreter_puts(s);
 	interpreter_puts("\r\n");
@@ -25,19 +39,13 @@ struct entry_t {
 	int (*func)(int, const char **);
 };
 
-extern "C" int tinybasic_interpreter(int argc, const char* argv[]);
-
-int cmd_help(int argc, const char* argv[]) {
-	(void) argc;
-	(void) argv;
-	interpreter_putln("FUAAAAAAAAAAAA!!!");
-	return 0;
-}
-
 static entry_t entries[] = { //
-		{ "basic", tinybasic_interpreter },
-		{ "help", cmd_help }
-};
+		//
+				{ "basic", tinybasic_interpreter }, //
+				{ "tcl", picol_main }, //
+				// { "jimtcl", jimtcl_main }, //
+				{ "help", cmd_help } //
+		};
 
 template<typename T, int size>
 int GetArrLength(T (&)[size]) {

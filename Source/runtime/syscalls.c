@@ -1,109 +1,141 @@
-/*
- * syscalls.c
- *
- *  @brief: Come descritto qui:
- *
- *  			 http://embdev.net/topic/177530
- *  			 http://www.utasker.com/forum/index.php?topic=748.0 (terzo post)
- *  			 file:///C:/Programmi/CodeSourcery/Sourcery%20G++%20Lite/share/doc/arm-arm-none-eabi/html/libc/Syscalls.html (man CodeSourcery)
- *
- *  questo codice serve a linkare correttamente la libreria newlib degli ARM.
- *  Il codice risultante qui sotto e' un collage delle varie versioni di syscall.c trovate in giro
- *  per la rete e fornisce una versione minimale che consente di compilare il progetto
- *  correttamente.
- */
-// TODO: Da verificare se non crea problemi di sorta a runtime.
 #include <reent.h>
 #include <errno.h>
-#include <stdlib.h> /* abort */
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/unistd.h>
 
-#include "stm32f10x.h" /* for _get_PSP() from core_cm3.h*/
-
-#undef errno
-extern int errno;
-
-extern int errno;
-extern int _end;
-
-caddr_t _sbrk(int incr) {
-
-	static unsigned char *heap = NULL;
-	unsigned char *prev_heap;
-	if (heap == NULL) {
-		heap = (unsigned char *) &_end;
-	}
-
-	prev_heap = heap;
-	heap += incr;
-	return (caddr_t) prev_heap;
-}
-
-#if 0
-void *_sbrk_r (struct _reent *r, ptrdiff_t incr) {
-	return _sbrk(incr);
-}
-#endif
-
-void _exit(int status) {
-	// xprintf("_exit called with parameter %d\n", status);
-	while (1) {
-		;
-	} // Blocca tutto!
-}
-
-int _getpid(void) {
-	return 1;
-}
-
-int _kill(int pid, int sig) {
-	(void) pid;
-	(void) sig; /* avoid warnings */
-	errno = EINVAL;
+int _gettimeofday_r(struct _reent *e, struct timeval *__tp, void *__tzp) {
 	return -1;
 }
 
-int link(char *old, char *new) {
+int _close_r(struct _reent *ctx, int fd) {
 	return -1;
 }
 
-int _open(const char *name, int flags, int mode) {
+int _execve_r(struct _reent *ctx, const char *filename, char * const *argv,
+		char * const *envp) {
+	errno = ENOMEM;
 	return -1;
 }
 
-int _close(int file) {
+int _fcntl_r(struct _reent *ctx, int fd, int cmd, int param) {
+	errno = EBADF;
 	return -1;
 }
 
-int _fstat(int file, struct stat *st) {
+int _fork_r(struct _reent *ctx) {
+	errno = EAGAIN;
+	return -1;
+}
+
+int _fstat_r(struct _reent *ctx, int fd, struct stat *st) {
 	st->st_mode = S_IFCHR;
 	return 0;
 }
 
-int _isatty(int file) {
+int _getpid_r(struct _reent *ctx) {
 	return 1;
 }
 
-int _lseek(int file, int ptr, int dir) {
+int _isatty_r(struct _reent *ctx, int fd) {
+	switch (fd) {
+	case STDOUT_FILENO:
+	case STDERR_FILENO:
+	case STDIN_FILENO:
+		return 1;
+	default:
+		//errno = ENOTTY;
+		errno = EBADF;
+		return 0;
+	}
+}
+
+int _kill_r(struct _reent *ctx, int pid, int sig) {
+	errno = EINVAL;
+	return -1;
+}
+
+int _link_r(struct _reent *ctx, const char *oldname, const char *newname) {
+	errno = EMLINK;
+	return -1;
+}
+
+_off_t _lseek_r(struct _reent *ctx, int fd, _off_t offset, int dir) {
 	return 0;
 }
 
-int _read(int file, char *ptr, int len) {
+int _mkdir_r(struct _reent *ctx, const char *filename, int mode) {
+	errno = ENOENT;
+	return -1;
+}
+
+int _open_r(struct _reent *ctx, const char *filename, int mode, int extra) {
+	return -1;
+}
+
+int _rename_r(struct _reent *ctx, const char *oldname, const char *newname) {
+	errno = ENOENT;
+	return -1;
+}
+
+void *_sbrk_r(struct _reent *ctx, ptrdiff_t incr) {
+	extern int _end;
+	static unsigned char *heap = NULL;
+	unsigned char *prev_heap;
+
+	if (heap == NULL )
+		heap = (unsigned char *) &_end;
+	prev_heap = heap;
+	heap += incr;
+	return (void*) prev_heap;
+}
+
+int _stat_r(struct _reent *ctx, const char *fname, struct stat *st) {
+	st->st_mode = S_IFCHR;
 	return 0;
 }
 
-int _write(int file, char *ptr, int len) {
-	return len;
+unsigned long _times_r(struct _reent *ctx, struct tms *ms) {
+	return -1;
 }
 
-// extern char _end; /* Defined by the linker (c'è gia' sopra)*/
-static char *heap_end;
-
-char* get_heap_end(void) {
-	return (char*) heap_end;
+int _unlink_r(struct _reent *ctx, const char *filename) {
+	errno = ENOENT;
+	return -1;
 }
 
-char* get_stack_top(void) {
-	return (char*) __get_MSP();
+int _wait_r(struct _reent *ctx, int *status) {
+	errno = ECHILD;
+	return -1;
+}
+
+extern int usb_cdc_putc(char c);
+extern int usb_cdc_getc(char *c);
+
+_ssize_t _write_r(struct _reent *ctx, int fd, const void *data, size_t size) {
+	_ssize_t counter;
+	switch (fd) {
+	case STDOUT_FILENO:
+	case STDERR_FILENO:
+		for (counter = 0; counter < size; counter++)
+			if (usb_cdc_putc(*(char*)(data++)) == -1)
+				return counter;
+		return counter;
+	default:
+		errno = EBADF;
+		return -1;
+	}
+}
+
+_ssize_t _read_r(struct _reent *ctx, int fd, void *buf, size_t size) {
+	_ssize_t counter;
+	switch (fd) {
+	case STDIN_FILENO:
+		for (counter = 0; counter < size; counter++)
+			if (usb_cdc_getc((char*)(buf++)) == -1)
+				return counter;
+		return counter;
+	default:
+		errno = EBADF;
+		return -1;
+	}
 }

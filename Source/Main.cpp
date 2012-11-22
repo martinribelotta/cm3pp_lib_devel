@@ -26,7 +26,7 @@ RTOS::Task taskLed(Functional::build([]() {
 
 extern int execute(int argc, const char **argv);
 
-static Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
+Stream::LineReader<usb_cdc_getc, usb_cdc_putc> lineReader;
 
 RTOS::Task taskUSB(Functional::build([]() {
 	while(1) {
